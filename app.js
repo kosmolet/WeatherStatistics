@@ -1,63 +1,46 @@
 
-let headers = ['Temperature', 'Date'];
 let weather = [];
+let results = document.getElementById('results');
 
 function drawTable() {
     let table = document.querySelector('table');
 
-    while (table.rows.length > 0) {
-        table.deleteRow(0);
-    }
-    let headerRow = document.createElement('tr');
-    headers.forEach(headerText => {
-        let header = document.createElement('th');
-        let textNode = document.createTextNode(headerText);
-        header.appendChild(textNode);
-        headerRow.appendChild(header);
-    });
-    table.appendChild(headerRow);
-
+    let tableRows = "";
     weather.forEach(wth => {
-        let row = document.createElement('tr');
-        Object.values(wth).forEach(text => {
-            let cell = document.createElement('td');
-            let textNode = document.createTextNode(text);
-            cell.appendChild(textNode);
-            row.appendChild(cell);
-        })
-
-        table.appendChild(row);
+        tableRows += `<tr><td>${wth.temperature}</td><td>${wth.date}</td></tr>`
     })
+    table.innerHTML = tableRows;
+
+    let row = table.createTHead().insertRow(0);
+    row.insertCell(0).innerHTML = 'Temperature';
+    row.insertCell(1).innerHTML = 'Date';
+
     drawChart();
 }
 
-
 function drawChart() {
-    let xAxisArray = weather.map(x => x.date);
-    let yAxisArray = weather.map(y => y.temperature);
-    var ctx = document.getElementById('weatherTableChart').getContext('2d');
-    var chart = new Chart(ctx, {
-        // The type of chart we want to create
+    let sortedWeatherByDate = weather.sort(function (a, b) { return new Date(a.date) - new Date(b.date) });
+    let xAxisArray = sortedWeatherByDate.map(x => x.date);
+    let yAxisArray = sortedWeatherByDate.map(y => y.temperature);
+    let ctx = document.getElementById('weatherTableChart').getContext('2d');
+    let chart = new Chart(ctx, {
         type: 'line',
-
-        // The data for our dataset
         data: {
-            labels: xAxisArray.sort(), //['2020-09-01', '2020-09-07', '2020-09-14', '2020-09-21', '2020-09-31'],
+            labels: xAxisArray,
             datasets: [{
                 label: 'Weather Statistic',
                 backgroundColor: 'rgb(255, 99, 132)',
                 borderColor: 'rgb(255, 99, 132)',
-                data: yAxisArray//[0, 10, 5, 2, 20, 30, 45]
+                data: yAxisArray
             }]
         },
-
-        // Configuration options go here
         options: {}
     });
 }
 
 const addWeatherStatistic = (ev) => {
     ev.preventDefault();
+    hideResults();
     let temperature = document.getElementById("temperature").value;
     let date = document.getElementById("date").value;
     if (!temperature || !date) {
@@ -76,6 +59,7 @@ const addWeatherStatistic = (ev) => {
 
 const generateWeatherStatistic = (ev) => {
     ev.preventDefault();
+    hideResults();
     rowsAmount = 10
     while (rowsAmount > 0) {
         let randomTemperature = Math.floor(Math.random() * 101);
@@ -92,20 +76,64 @@ const generateWeatherStatistic = (ev) => {
 
 }
 
+
+const addResults = (type, calc) => {
+    let para = document.createElement("p");
+    para.appendChild(document.createTextNode(`The ${type} temperature is ${calc}`));
+    results.appendChild(para);
+    para.classList.add("pResults");
+}
+
+const hideResults = () => {
+    let p_list = document.getElementsByClassName("pResults");
+    for (let i = p_list.length - 1; i >= 0; i--) {
+        let p = p_list[i];
+        p.parentNode.removeChild(p);
+    }
+}
+
+const getMax = (ev) => {
+    ev.preventDefault();
+    if (weather.length == 0) {
+        alert("Please add the temperature/date records first!");
+        return;
+    }
+    let sortedWeatherByTemp = weather.sort(function (a, b) { return a.temperature - b.temperature });
+    let maxTempo = sortedWeatherByTemp[sortedWeatherByTemp.length - 1].temperature;
+    addResults("max", maxTempo);
+
+
+}
+
+const getMin = (ev) => {
+    ev.preventDefault();
+    if (weather.length == 0) {
+        alert("Please add the temperature/date records first!");
+        return;
+    }
+    let sortedWeatherByTemp = weather.sort(function (a, b) { return a.temperature - b.temperature });
+    let minTempo = sortedWeatherByTemp[0].temperature;
+    addResults("min", minTempo);
+}
+
+const getAverage = (ev) => {
+    ev.preventDefault();
+    if (weather.length == 0) {
+        alert("Please add the temperature/date records first!");
+        return;
+    }
+    let total = 0;
+    weather.forEach(item => total += (Number(item.temperature)));
+    let averageTempo = Math.round(total / (weather.length));
+    addResults("average", averageTempo);
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("add").addEventListener('click', addWeatherStatistic);
-
-});
-
-document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("seed").addEventListener('click', generateWeatherStatistic);
+    document.getElementById("average").addEventListener('click', getAverage);
+    document.getElementById("maxTemp").addEventListener('click', getMax);
+    document.getElementById("minTemp").addEventListener('click', getMin);
 
 });
-
-
-
-
-
-
-
-
