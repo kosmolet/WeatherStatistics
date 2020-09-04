@@ -2,6 +2,23 @@
 let weather = [];
 let results = document.getElementById('results');
 
+// function bubbleSort(a, par) {
+//     var swapped;
+//     do {
+//         swapped = false;
+//         for (var i = 0; i < a.length - 1; i++) {
+//             if (a[i].par > a[i + 1].par) {
+//                 var temp = a[i];
+
+//                 a[i] = a[i + 1];
+//                 a[i + 1] = temp;
+
+//                 swapped = true;
+//             }
+//         }
+//     } while (swapped);
+// }
+
 function drawTable() {
     let WeatherByDate = weather.sort(function (a, b) { return new Date(a.date) - new Date(b.date) });
     let table = document.querySelector('table');
@@ -46,6 +63,22 @@ function isDateInWeatherArray(dateString) {
     }
     return found;
 }
+//from lesson 04-09
+// function sort(weather, sortBy = "temperature") {
+//     var length = weather.length;
+//     for (var i = 0; i < length; i++) {
+//       for (var j = 0; j < length - 1 - i; j++) {
+//         if (weather[j][sortBy] > weather[j + 1][sortBy]) {
+//           const holder = weather[j];
+//           weather[j] = weather[j + 1];
+//           weather[j + 1] = holder;
+//         }
+//       }
+//     }
+
+//     return weather;
+//   }
+
 
 const addWeatherStatistic = (ev) => {
     ev.preventDefault();
@@ -75,9 +108,11 @@ const generateWeatherStatistic = (ev) => {
     ev.preventDefault();
     hideResults();
     rowsAmount = 10
+    start = new Date(2020, 1, 1)
+    end = new Date(2020, 12, 30)
     while (rowsAmount > 0) {
         let randomTemperature = -40 + Math.floor(Math.random() * 101);
-        let randomDate = ((new Date(+(new Date(2020, 09, 01)) + Math.random() * ((new Date(2020, 09, 20)) - (new Date(2020, 09, 01)))).toJSON()).slice(0, 10));
+        let randomDate = ((new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))).toJSON()).slice(0, 10);
         if (!isDateInWeatherArray(randomDate)) {
             let weatherItem = {
                 temperature: randomTemperature,
@@ -116,8 +151,21 @@ const getMax = (ev) => {
         alert("Please add the temperature/date records first!");
         return;
     }
-    let sortedWeatherByTemp = weather.sort(function (a, b) { return a.temperature - b.temperature });
-    let maxTempo = sortedWeatherByTemp[sortedWeatherByTemp.length - 1].temperature;
+    //let sortedWeatherByTemp = weather.sort(function (a, b) { return a.temperature - b.temperature });
+    var swapped;
+    do {
+        swapped = false;
+        for (var i = 0; i < weather.length - 1; i++) {
+            if (weather[i].temperature > weather[i + 1].temperature) {
+                var temp = weather[i];
+                weather[i] = weather[i + 1];
+                weather[i + 1] = temp;
+                swapped = true;
+            }
+        }
+    } while (swapped);
+    //let maxTempo = sortedWeatherByTemp[sortedWeatherByTemp.length - 1].temperature;
+    let maxTempo = weather[weather.length - 1].temperature;
     addResults("max", maxTempo);
 
 
@@ -129,8 +177,19 @@ const getMin = (ev) => {
         alert("Please add the temperature/date records first!");
         return;
     }
-    let sortedWeatherByTemp = weather.sort(function (a, b) { return a.temperature - b.temperature });
-    let minTempo = sortedWeatherByTemp[0].temperature;
+    var swapped;
+    do {
+        swapped = false;
+        for (var i = 0; i < weather.length - 1; i++) {
+            if (weather[i].temperature > weather[i + 1].temperature) {
+                var temp = weather[i];
+                weather[i] = weather[i + 1];
+                weather[i + 1] = temp;
+                swapped = true;
+            }
+        }
+    } while (swapped);
+    let minTempo = weather[0].temperature;
     addResults("min", minTempo);
 }
 

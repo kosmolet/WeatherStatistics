@@ -145,7 +145,7 @@ body {
     background: LIGHTSTEELBLUE;
   }
   
-  
+/*   
   .container{
     width: 450px;
     height: 450px;
@@ -346,4 +346,4 @@ body {
       0% { transform: translateY(1rem); }
       100% { transform: translateY(2.6rem); }
   }
-    
+     */
