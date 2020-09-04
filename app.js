@@ -19,6 +19,22 @@ let results = document.getElementById('results');
 //     } while (swapped);
 // }
 
+//from lesson 04-09
+// function sort(weather, sortBy = "temperature") {
+//     var length = weather.length;
+//     for (var i = 0; i < length; i++) {
+//       for (var j = 0; j < length - 1 - i; j++) {
+//         if (weather[j][sortBy] > weather[j + 1][sortBy]) {
+//           const holder = weather[j];
+//           weather[j] = weather[j + 1];
+//           weather[j + 1] = holder;
+//         }
+//       }
+//     }
+
+//     return weather;
+//   }
+
 function drawTable() {
     let WeatherByDate = weather.sort(function (a, b) { return new Date(a.date) - new Date(b.date) });
     let table = document.querySelector('table');
@@ -63,22 +79,6 @@ function isDateInWeatherArray(dateString) {
     }
     return found;
 }
-//from lesson 04-09
-// function sort(weather, sortBy = "temperature") {
-//     var length = weather.length;
-//     for (var i = 0; i < length; i++) {
-//       for (var j = 0; j < length - 1 - i; j++) {
-//         if (weather[j][sortBy] > weather[j + 1][sortBy]) {
-//           const holder = weather[j];
-//           weather[j] = weather[j + 1];
-//           weather[j + 1] = holder;
-//         }
-//       }
-//     }
-
-//     return weather;
-//   }
-
 
 const addWeatherStatistic = (ev) => {
     ev.preventDefault();
@@ -121,13 +121,9 @@ const generateWeatherStatistic = (ev) => {
             weather.push(weatherItem);
             rowsAmount--;
         }
-
     }
     drawTable();
-
 }
-
-
 
 
 const addResults = (type, calc) => {
@@ -205,6 +201,72 @@ const getAverage = (ev) => {
     addResults("average", averageTempo);
 }
 
+function drawChartLesson3API() {
+    fetch('https://my-json-server.typicode.com/dimitrisfasoulas/jsonServerWeather/temperature')
+        .then(response => response.json())
+        .then(data => createChart(data));
+
+    const createChart = data => {
+        var ctx = document.getElementById('lesson3APIChart');
+
+        const labels = [];
+
+        for (i = 1; i <= data.greece.length; i++) {
+            labels.push(`Day" ${i}`);
+        }
+        console.log(labels);
+
+        const totals = { greece: 0, sweden: 0 };
+        for (i = 0; i < data.greece.length; i++) {
+            totals.greece += data.greece[i];
+            totals.sweden += data.sweden[i];
+        }
+        console.log(totals);
+
+        var myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+
+                datasets: [
+                    {
+                        label: "Temperature in Greece",
+                        borderColor: 'Darkblue',
+                        data: data.greece,
+                        fill: false,
+                        lineTension: 0
+
+                    },
+                    {
+                        label: "Temperature in Sweden",
+                        borderColor: 'Gold',
+                        data: data.sweden,
+                        fill: false,
+                        lineTension: 0
+
+                    },
+                    {
+                        label: "Temperature in Greece",
+                        borderColor: 'blue',
+                        data: Array(data.greece.length).fill(totals.greece / data.greece.length),
+                        fill: false,
+                        pointRadius: 0
+
+                    },
+                    {
+                        label: "Temperature in Sweden",
+                        borderColor: 'Yellow',
+                        data: Array(data.sweden.length).fill(totals.sweden / data.sweden.length),
+                        fill: false,
+                        pointRadius: 0
+
+                    }]
+            },
+            options: {}
+        });
+    }
+}
+drawChartLesson3API()
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("add").addEventListener('click', addWeatherStatistic);
