@@ -3,18 +3,16 @@ let weather = [];
 let results = document.getElementById('results');
 
 function drawTable() {
+    let WeatherByDate = weather.sort(function (a, b) { return new Date(a.date) - new Date(b.date) });
     let table = document.querySelector('table');
-
     let tableRows = "";
-    weather.forEach(wth => {
+    WeatherByDate.forEach(wth => {
         tableRows += `<tr><td>${wth.temperature}</td><td>${wth.date}</td></tr>`
     })
     table.innerHTML = tableRows;
-
     let row = table.createTHead().insertRow(0);
     row.insertCell(0).innerHTML = 'Temperature';
     row.insertCell(1).innerHTML = 'Date';
-
     drawChart();
 }
 
@@ -38,6 +36,17 @@ function drawChart() {
     });
 }
 
+function isDateInWeatherArray(dateString) {
+    let found = false;
+    for (var i = 0; i < weather.length; i++) {
+        if (weather[i].date == dateString) {
+            found = true;
+            break;
+        }
+    }
+    return found;
+}
+
 const addWeatherStatistic = (ev) => {
     ev.preventDefault();
     hideResults();
@@ -47,6 +56,11 @@ const addWeatherStatistic = (ev) => {
         alert("Please fill out all fields");
         return;
     }
+    else if (isDateInWeatherArray(date)) {
+        alert("Please select another Date. The temprature for the selected Date has been already added");
+        return;
+    }
+
     let weatherItem = {
         temperature: document.getElementById("temperature").value,
         date: document.getElementById("date").value
@@ -62,19 +76,23 @@ const generateWeatherStatistic = (ev) => {
     hideResults();
     rowsAmount = 10
     while (rowsAmount > 0) {
-        let randomTemperature = Math.floor(Math.random() * 101);
+        let randomTemperature = -40 + Math.floor(Math.random() * 101);
         let randomDate = ((new Date(+(new Date(2020, 09, 01)) + Math.random() * ((new Date(2020, 09, 20)) - (new Date(2020, 09, 01)))).toJSON()).slice(0, 10));
-        let weatherItem = {
-            temperature: randomTemperature,
-            date: randomDate
+        if (!isDateInWeatherArray(randomDate)) {
+            let weatherItem = {
+                temperature: randomTemperature,
+                date: randomDate
+            }
+            weather.push(weatherItem);
+            rowsAmount--;
         }
-        weather.push(weatherItem);
-        rowsAmount--;
 
     }
     drawTable();
 
 }
+
+
 
 
 const addResults = (type, calc) => {
